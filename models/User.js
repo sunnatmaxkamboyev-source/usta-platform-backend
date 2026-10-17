@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -27,6 +28,13 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // Profil rasmi uchun URL
+    profileImage: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     role: {
       type: String,
       enum: ["usta", "admin"],
@@ -37,8 +45,6 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-
 
 const User = mongoose.model("User", userSchema);
 

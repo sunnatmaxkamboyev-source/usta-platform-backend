@@ -1,6 +1,5 @@
 const Vacancy = require("../models/Vacancy");
 
-
 // ========================================
 // CREATE VACANCY
 // ========================================
@@ -32,7 +31,7 @@ const createVacancy = async (req, res) => {
       });
     }
 
-    // Yangi vakansiya
+    // Yangi vakansiya yaratish
     const vacancy = await Vacancy.create({
       title,
       category,
@@ -41,10 +40,7 @@ const createVacancy = async (req, res) => {
       description,
       contactPhone,
       telegram,
-
-      // JWT middleware orqali keladi
       usta: req.user.id,
-
       status: "active",
     });
 
@@ -54,10 +50,7 @@ const createVacancy = async (req, res) => {
       vacancy,
     });
   } catch (error) {
-    console.error(
-      "Create vacancy error:",
-      error
-    );
+    console.error("Create vacancy error:", error);
 
     res.status(500).json({
       success: false,
@@ -65,7 +58,6 @@ const createVacancy = async (req, res) => {
     });
   }
 };
-
 
 // ========================================
 // GET ALL VACANCIES
@@ -78,7 +70,7 @@ const getVacancies = async (req, res) => {
     })
       .populate(
         "usta",
-        "name phone profession"
+        "name phone profession profileImage"
       )
       .sort({
         createdAt: -1,
@@ -90,19 +82,14 @@ const getVacancies = async (req, res) => {
       vacancies,
     });
   } catch (error) {
-    console.error(
-      "Get vacancies error:",
-      error
-    );
+    console.error("Get vacancies error:", error);
 
     res.status(500).json({
       success: false,
-      message:
-        "Vakansiyalarni olishda xatolik yuz berdi",
+      message: "Vakansiyalarni olishda xatolik yuz berdi",
     });
   }
 };
-
 
 // ========================================
 // GET SINGLE VACANCY
@@ -114,7 +101,7 @@ const getVacancyById = async (req, res) => {
       req.params.id
     ).populate(
       "usta",
-      "name phone profession"
+      "name phone profession profileImage"
     );
 
     if (!vacancy) {
@@ -134,19 +121,14 @@ const getVacancyById = async (req, res) => {
       vacancy,
     });
   } catch (error) {
-    console.error(
-      "Get vacancy error:",
-      error
-    );
+    console.error("Get vacancy error:", error);
 
     res.status(500).json({
       success: false,
-      message:
-        "Vakansiyani olishda xatolik yuz berdi",
+      message: "Vakansiyani olishda xatolik yuz berdi",
     });
   }
 };
-
 
 // ========================================
 // GET MY VACANCIES
@@ -169,19 +151,14 @@ const getMyVacancies = async (req, res) => {
       vacancies,
     });
   } catch (error) {
-    console.error(
-      "Get my vacancies error:",
-      error
-    );
+    console.error("Get my vacancies error:", error);
 
     res.status(500).json({
       success: false,
-      message:
-        "Vakansiyalarni olishda xatolik yuz berdi",
+      message: "Vakansiyalarni olishda xatolik yuz berdi",
     });
   }
 };
-
 
 // ========================================
 // UPDATE VACANCY
@@ -189,10 +166,9 @@ const getMyVacancies = async (req, res) => {
 
 const updateVacancy = async (req, res) => {
   try {
-    const vacancy =
-      await Vacancy.findById(
-        req.params.id
-      );
+    const vacancy = await Vacancy.findById(
+      req.params.id
+    );
 
     if (!vacancy) {
       return res.status(404).json({
@@ -201,7 +177,7 @@ const updateVacancy = async (req, res) => {
       });
     }
 
-    // Vakansiya shu userga tegishlimi?
+    // Vakansiya shu ustaga tegishlimi?
     if (
       vacancy.usta.toString() !==
       req.user.id.toString()
@@ -223,49 +199,30 @@ const updateVacancy = async (req, res) => {
       telegram,
     } = req.body;
 
-    vacancy.title =
-      title ?? vacancy.title;
-
-    vacancy.category =
-      category ?? vacancy.category;
-
-    vacancy.location =
-      location ?? vacancy.location;
-
-    vacancy.price =
-      price ?? vacancy.price;
-
-    vacancy.description =
-      description ?? vacancy.description;
-
-    vacancy.contactPhone =
-      contactPhone ?? vacancy.contactPhone;
-
-    vacancy.telegram =
-      telegram ?? vacancy.telegram;
+    vacancy.title = title ?? vacancy.title;
+    vacancy.category = category ?? vacancy.category;
+    vacancy.location = location ?? vacancy.location;
+    vacancy.price = price ?? vacancy.price;
+    vacancy.description = description ?? vacancy.description;
+    vacancy.contactPhone = contactPhone ?? vacancy.contactPhone;
+    vacancy.telegram = telegram ?? vacancy.telegram;
 
     await vacancy.save();
 
     res.status(200).json({
       success: true,
-      message:
-        "Vakansiya muvaffaqiyatli yangilandi",
+      message: "Vakansiya muvaffaqiyatli yangilandi",
       vacancy,
     });
   } catch (error) {
-    console.error(
-      "Update vacancy error:",
-      error
-    );
+    console.error("Update vacancy error:", error);
 
     res.status(500).json({
       success: false,
-      message:
-        "Vakansiyani yangilashda xatolik yuz berdi",
+      message: "Vakansiyani yangilashda xatolik yuz berdi",
     });
   }
 };
-
 
 // ========================================
 // DELETE VACANCY
@@ -273,10 +230,9 @@ const updateVacancy = async (req, res) => {
 
 const deleteVacancy = async (req, res) => {
   try {
-    const vacancy =
-      await Vacancy.findById(
-        req.params.id
-      );
+    const vacancy = await Vacancy.findById(
+      req.params.id
+    );
 
     if (!vacancy) {
       return res.status(404).json({
@@ -304,23 +260,17 @@ const deleteVacancy = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message:
-        "Vakansiya muvaffaqiyatli o'chirildi",
+      message: "Vakansiya muvaffaqiyatli o'chirildi",
     });
   } catch (error) {
-    console.error(
-      "Delete vacancy error:",
-      error
-    );
+    console.error("Delete vacancy error:", error);
 
     res.status(500).json({
       success: false,
-      message:
-        "Vakansiyani o'chirishda xatolik yuz berdi",
+      message: "Vakansiyani o'chirishda xatolik yuz berdi",
     });
   }
 };
-
 
 // ========================================
 // EXPORT
