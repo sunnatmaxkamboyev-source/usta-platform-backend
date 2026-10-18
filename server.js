@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -14,11 +15,6 @@ const workSampleRoutes = require("./routes/workSampleRoutes");
 // ========================================
 
 const app = express();
-
-// ========================================
-// PORT
-// ========================================
-
 const PORT = process.env.PORT || 5000;
 
 // ========================================
@@ -32,22 +28,19 @@ connectDB();
 // ========================================
 
 app.use(cors());
-app.use(express.json());
+
+// JSON so'rovlar uchun hajm limiti.
+// Base64 rasm yuborilganda JSON hajmi kattalashishini hisobga olamiz.
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 // ========================================
 // ROUTES
 // ========================================
 
-// Authentication API
 app.use("/api/auth", authRoutes);
-
-// Vacancy API
 app.use("/api/vacancies", vacancyRoutes);
-
-// Admin API
 app.use("/api/admin", adminRoutes);
-
-// Work Samples API
 app.use("/api/work-samples", workSampleRoutes);
 
 // ========================================
@@ -55,7 +48,7 @@ app.use("/api/work-samples", workSampleRoutes);
 // ========================================
 
 app.get("/", (req, res) => {
-  res.send("Usta Platform API ishlayapti");
+  res.status(200).send("Usta Platform API ishlayapti");
 });
 
 // ========================================
@@ -74,9 +67,22 @@ app.use((req, res) => {
 // ========================================
 
 app.use((err, req, res, next) => {
-  console.error("Server xatosi:", err);
+  console.error("Server xatosi:", {
+    message: err.message,
+    type: err.type,
+    status: err.status,
+    path: req.originalUrl,
+  });
 
-  res.status(err.status || 500).json({
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({
+      success: false,
+      message:
+        "So'rov hajmi juda katta. Rasmni kichraytirib qayta urinib ko'ring.",
+    });
+  }
+
+  return res.status(err.status || 500).json({
     success: false,
     message:
       err.status && err.status < 500
